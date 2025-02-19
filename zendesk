@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+   <meta charset="UTF-8">
+   <title>Сравнение изображений</title>
+   <style>
+       /* Стили для контейнера и изображений */
+       .img-comp-container {
+           position: relative;
+           width: 100%;
+           max-width: 500px; /* Максимальная ширина контейнера */
+       }
+       .img-comp-img {
+           position: absolute;
+           width: 100%;
+           height: auto;
+           overflow: hidden;
+       }
+       .img-comp-img img {
+           display: block;
+           width: 100%;
+           height: auto;
+       }
+       .img-comp-slider {
+           position: absolute;
+           z-index: 9;
+           cursor: ew-resize;
+           width: 40px;
+           height: 40px;
+           background-color: #2196F3;
+           opacity: 0.7;
+           border-radius: 50%;
+       }
+   </style>
+</head>
+<body>
+   <h1>Сравнение изображений</h1>
+   <p>Перетащите ползунок для сравнения изображений:</p>
+   <div class="img-comp-container">
+       <div class="img-comp-img">
+           <img src="image1.jpg" alt="До">
+       </div>
+       <div class="img-comp-img img-comp-overlay">
+           <img src="image2.jpg" alt="После">
+       </div>
+       <div class="img-comp-slider"></div>
+   </div>
+   <script>
+       // JavaScript для функционала сравнения
+       function initComparisons() {
+           var x = document.getElementsByClassName("img-comp-overlay");
+           for (var i = 0; i < x.length; i++) {
+               compareImages(x[i]);
+           }
+           function compareImages(img) {
+               var slider = img.parentElement.querySelector(".img-comp-slider");
+               var clicked = 0, w = img.offsetWidth;
+               img.style.width = (w / 2) + "px";
+               slider.style.top = (img.offsetHeight / 2) - (slider.offsetHeight / 2) + "px";
+               slider.style.left = (w / 2) - (slider.offsetWidth / 2) + "px";
+               slider.addEventListener("mousedown", slideReady);
+               window.addEventListener("mouseup", slideFinish);
+               slider.addEventListener("touchstart", slideReady);
+               window.addEventListener("touchend", slideFinish);
+               function slideReady(e) {
+                   e.preventDefault();
+                   clicked = 1;
+                   window.addEventListener("mousemove", slideMove);
+                   window.addEventListener("touchmove", slideMove);
+               }
+               function slideFinish() {
+                   clicked = 0;
+               }
+               function slideMove(e) {
+                   if (clicked == 0) return false;
+                   var pos = getCursorPos(e);
+                   if (pos < 0) pos = 0;
+                   if (pos > w) pos = w;
+                   img.style.width = pos + "px";
+                   slider.style.left = img.offsetWidth - (slider.offsetWidth / 2) + "px";
+               }
+               function getCursorPos(e) {
+                   e = e || window.event;
+                   var a = img.getBoundingClientRect();
+                   var x = e.pageX - a.left;
+                   x = x - window.pageXOffset;
+                   return x;
+               }
+           }
+       }
+       document.addEventListener("DOMContentLoaded", initComparisons);
+   </script>
+</body>
+</html>
